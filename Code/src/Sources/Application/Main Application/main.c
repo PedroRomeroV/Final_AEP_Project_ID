@@ -8,6 +8,9 @@
 #include    "Can.h"
 #include    "Can_Cfg.h"
 #include    "sysinit.h"
+#include    "Speedometer.h"
+#include	"Visual_Indicators.h"
+#include "LED.h"
 /*~E*/
 /*~A*/
 /*~+:Main Code*/
@@ -21,7 +24,13 @@ sysinit_InitSysClock();
 /* Memory Allcoation Initialization */
 	MemAllocInit(&MemAllocConfig);
 	/*Initialize LEDs on TRK-MPC560xB board */
-	vfnGPIO_LED_Init(); 
+//	vfnGPIO_LED_Init(); 
+//	GPIO_Init();
+//	StepperMotor_Init();
+	Speedometer_Init();
+	LED_Driver_Init();
+	Visual_Indicator_Init();
+	Button_DriverInit();
 /* SBC dependencies */
 	    InitDSPI_1();//----------------------------------------------------------------
 	    ConfigureMZC33905DSPI_1();//...............................................................

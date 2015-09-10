@@ -60,28 +60,30 @@
 * \return   void
 */
 
+/*
 void vfnGPIO_Init_channel(uint8_t channel, uint8_t input_output, uint8_t Open_drain)
 {
     if (input_output == GPIO_OUTPUT)
     {
-    	SIU.PCR[channel].B.PA  = 0;  				/* GPIO */
-    	SIU.PCR[channel].B.OBE = 1;					/* Output buffer enable */
+    	SIU.PCR[channel].B.PA  = 0;  				
+    	SIU.PCR[channel].B.OBE = 1;					
     	if (Open_drain == GPIO_OPEN_DRAIN_ENABLE)
     	{
-    		SIU.PCR[channel].B.ODE = 1;				/* Open drain option enable */	
+    		SIU.PCR[channel].B.ODE = 1;					
     	}
     	else
     	{	
-    		SIU.PCR[channel].B.ODE = 0;				/* Push-pull option enable */	
+    		SIU.PCR[channel].B.ODE = 0;				
     	}
     }
     else if (input_output == GPIO_INPUT)
     {
-    	SIU.PCR[channel].B.PA  = 0;  				/* GPIO */
-    	SIU.PCR[channel].B.IBE = 1;					/* Input buffer enable */	
+    	SIU.PCR[channel].B.PA  = 0;  			
+    	SIU.PCR[channel].B.IBE = 1;				
     }
 
 }
+*/	
 
 /****************************************************************************************************/
 /**
@@ -92,12 +94,6 @@ void vfnGPIO_Init_channel(uint8_t channel, uint8_t input_output, uint8_t Open_dr
 * \param    uint8_t Open_drain - Push pull or open drain selection modes 
 * \return   void
 */
-void vfnGPIO_Output(uint8_t channel, uint8_t logical_value)
-{
-    SIU.GPDO[channel].B.PDO  = logical_value;  		/* Drive the logical output value to the pin */
-
-}
-
 
 
 /****************************************************************************************************/
@@ -108,44 +104,6 @@ void vfnGPIO_Output(uint8_t channel, uint8_t logical_value)
 * \param    void
 * \return   void
 */
-void vfnGPIO_FlashMainLED(void)
-{
-    static uint8_t u8Counter = 0;
-    
-    u8Counter++;
-    switch (u8Counter)
-    {
-    case  1:
-            LED_ON(LED1);
-            LED_ON(LED2);
-            break;
-    case  11:
-            LED_ON(LED3);
-            LED_ON(LED4);                     
-            break;
-    case  21:
-            LED_ON(LED2);
-            LED_ON(LED3);                     
-            break;        
-    case  3:
-            LED_OFF(LED1);
-            LED_OFF(LED2);
-            break;
-    case  13:
-            LED_OFF(LED3);
-            LED_OFF(LED4);
-            break;                          
-    case  23:
-            LED_OFF(LED2);
-            LED_OFF(LED3);
-            break;        
-	case 100:
-		u8Counter = 0;
-		break;
-    }
-}
-
-
 /****************************************************************************************************/
 /**
 * \brief    Initialize GPIO port connected to LEDs on eval board
@@ -153,18 +111,134 @@ void vfnGPIO_FlashMainLED(void)
 * \param    void 
 * \return   void
 */
-void vfnGPIO_LED_Init(void)
-{
-    /* Data Port A initialization */
-	vfnGPIO_Init_channel(LED1,GPIO_OUTPUT,GPIO_OPEN_DRAIN_ENABLE);  /* PE4 --> LED1*/
-	vfnGPIO_Output (LED1, 1);
-	vfnGPIO_Init_channel(LED2,GPIO_OUTPUT,GPIO_OPEN_DRAIN_ENABLE);  /* PE5 --> LED2*/
-	vfnGPIO_Output (LED2, 1);
-	vfnGPIO_Init_channel(LED3,GPIO_OUTPUT,GPIO_OPEN_DRAIN_ENABLE);  /* PE6 --> LED3*/
-	vfnGPIO_Output (LED3, 1);
-	vfnGPIO_Init_channel(LED4,GPIO_OUTPUT,GPIO_OPEN_DRAIN_ENABLE);  /* PE7 --> LED4*/
-	vfnGPIO_Output (LED4, 1);
-	
-}
+
 
 /****************************************************************************************************/
+
+void GPIO_Init(void)
+{
+
+GPIO_InitChannel(PORTC4,GPIO_OUTPUT,GPIO_OPEN_DRAIN_DISABLE);
+GPIO_InitChannel(PORTC5,GPIO_OUTPUT,GPIO_OPEN_DRAIN_DISABLE);
+GPIO_InitChannel(PORTC6,GPIO_OUTPUT,GPIO_OPEN_DRAIN_DISABLE);
+GPIO_InitChannel(PORTC7,GPIO_OUTPUT,GPIO_OPEN_DRAIN_DISABLE);
+
+GPIO_SetHigh(PORTC4);
+GPIO_SetHigh(PORTC5);
+GPIO_SetHigh(PORTC6);
+GPIO_SetHigh(PORTC7);
+
+}
+
+
+void GPIO_InitChannel(T_UBYTE lub_Channel, T_UBYTE lub_InputOutput, T_UBYTE lub_OpenDrain)
+{
+    if (lub_InputOutput == GPIO_OUTPUT)
+    {
+    	SIU.PCR[lub_Channel].B.PA  = 0;  				/* GPIO */
+    	SIU.PCR[lub_Channel].B.OBE = 1;					/* Output buffer enable */
+    	if (lub_OpenDrain == GPIO_OPEN_DRAIN_ENABLE)
+    	{
+    		SIU.PCR[lub_Channel].B.ODE = 1;				/* Open drain option enable */	
+    	}
+    	else
+    	{	
+    		SIU.PCR[lub_Channel].B.ODE = 0;				/* Push-pull option enable */	
+    	}
+    }
+    else if (lub_InputOutput == GPIO_INPUT)
+    {
+    	SIU.PCR[lub_Channel].B.PA  = 0;  				/* GPIO */
+    	SIU.PCR[lub_Channel].B.IBE = 1;					/* Input buffer enable */	
+    }
+
+}
+
+void GPIO_InitPort(T_UBYTE lub_PORT, T_UBYTE lub_InputOutput, T_UBYTE lub_OpenDrain)
+{
+	T_UBYTE lub_Channel=0;
+	for(lub_Channel = lub_PORT;lub_Channel < lub_PORT+SIZEPORT  ; lub_Channel++)
+	{
+	    if (lub_InputOutput == GPIO_OUTPUT)
+	    {
+	    	SIU.PCR[lub_Channel].B.PA  = 0;  				/* GPIO */
+	    	SIU.PCR[lub_Channel].B.OBE = 1;					/* Output buffer enable */
+	    	if (lub_OpenDrain == GPIO_OPEN_DRAIN_ENABLE)
+	    	{
+	    		SIU.PCR[lub_Channel].B.ODE = 1;				/* Open drain option enable */	
+	    	}
+	    	else
+	    	{	
+	    		SIU.PCR[lub_Channel].B.ODE = 0;				/* Push-pull option enable */	
+	    	}
+	    }
+	    else if (lub_InputOutput == GPIO_INPUT)
+	    {
+	    	SIU.PCR[lub_Channel].B.PA  = 0;  				/* GPIO */
+	    	SIU.PCR[lub_Channel].B.IBE = 1;					/* Input buffer enable */	
+	    }
+	}
+}
+
+void GPIO_SetOutputChannel(T_UBYTE lub_Channel, T_UBYTE ub_LogicalValue)
+{
+    SIU.GPDO[lub_Channel].B.PDO  = ub_LogicalValue;  		/* Drive the logical output value to the pin */
+
+}
+
+void GPIO_SetOutputPORT(T_UBYTE lub_PORT, T_UWORD luw_Value)
+{
+	switch(lub_PORT)
+	{
+		case PORTA:
+			SIU.PGPDO[PORT_AB].R = (T_ULONG)luw_Value<<16;  
+		break;
+		case PORTB:
+			SIU.PGPDO[PORT_AB].R = (T_ULONG)luw_Value;
+		break;
+		case PORTC:
+			SIU.PGPDO[PORT_CD].R = (T_ULONG)luw_Value<<16;
+		break;
+		case PORTD:
+			SIU.PGPDO[PORT_CD].R = (T_ULONG)luw_Value;
+		break;
+		case PORTE:
+			SIU.PGPDO[PORT_EF].R = (T_ULONG)luw_Value<<16;
+		break;
+		case PORTF:
+			SIU.PGPDO[PORT_EF].R = (T_ULONG)luw_Value;
+		break;
+		case PORTG:
+			SIU.PGPDO[PORT_GH].R = (T_ULONG)luw_Value<<16;
+		break;
+		case PORTH:
+			SIU.PGPDO[PORT_GH].R = (T_ULONG)luw_Value;
+		break;
+		default:
+		break;
+		 
+	}                      
+}
+
+
+ void GPIO_SetHigh(T_UBYTE lub_Channel)
+{
+	SIU.GPDO[lub_Channel].B.PDO =  1;		
+}
+
+ void GPIO_SetLow(T_UBYTE lub_Channel)
+{
+	SIU.GPDO[lub_Channel].B.PDO =  0;		
+}
+
+
+T_UBYTE GPIO_GetStatusOutput(T_UBYTE lub_Channel)
+{
+	return SIU.GPDO[lub_Channel].B.PDO;		
+}
+
+
+T_UBYTE GPIO_GetStatusInput(T_UBYTE lub_Channel)
+{
+	return !SIU.GPDI[lub_Channel].R;		
+}
